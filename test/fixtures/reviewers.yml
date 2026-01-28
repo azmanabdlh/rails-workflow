@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  candidate_stage: one
+  phase: 1
+  decided_at: 2026-01-29
+  feedback: MyText
+  order: 1
+  user: one
+
+two:
+  candidate_stage: two
+  phase: 1
+  decided_at: 2026-01-29
+  feedback: MyText
+  order: 1
+  user: two

@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  candidate: one
+  stage: one
+  entered_at: 2026-01-28
+  exited_at: 2026-01-28
+
+two:
+  candidate: two
+  stage: two
+  entered_at: 2026-01-28
+  exited_at: 2026-01-28
