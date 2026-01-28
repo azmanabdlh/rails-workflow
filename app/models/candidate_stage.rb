@@ -6,12 +6,12 @@ class CandidateStage < ApplicationRecord
 
 
   def can_transition_stage?(stage_id)
-    return false if finalized?
+    return false if outcome?
 
     stage.id == stage_id or (stage.order + 1 == Stage.find(stage_id).order)
   end
 
-  def finalized?
+  def outcome?
     r = reviewers.find_by(order: 1)
     Reviewer::OUTCOME.index(r.phase.to_sym).present?
     # TODO:
