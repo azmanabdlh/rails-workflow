@@ -7,7 +7,7 @@ class CandidateStage < ApplicationRecord
 
   def can_transition_stage?(stage_id)
     unless outcome?
-      to = Stage.find(id)
+      to = Stage.find(stage_id)
       return (stage.order + 1) == to.order && to.post_id == stage.post_id
     end
 
