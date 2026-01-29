@@ -13,7 +13,7 @@ class CandidateStage < ApplicationRecord
   def valid_transition_phase?(phase)
     return false if outcome?
 
-    Reviewer.phases.key?(phase.to_s)
+    Reviewer.phases.key?(phase.to_sym)
   end
 
 
@@ -22,28 +22,30 @@ class CandidateStage < ApplicationRecord
       now = Time.current
       update!(exited_at: now)
 
-      candidate.candidate_stages.create!(
-        stage_id: to.id,
-        entered_at: now
-      )
+      candidate.candidate_stages.find_or_create_by(
+        stage_id: to.id
+      ) do |c|
+        c.entered_at = now
+      end
 
       candidate.update!(current_stage_id: to.id)
     end
   end
 
   def decide_by!(user, phase, **options)
-    return unless valid_transition_phase?(phase)
+    raise "unknown phase #{phase}" if not valid_transition_phase?(phase)
 
     r = reviewers.filter do |r|
       r if r.reviewable_by?(user)
-    end
+    end.first
 
     raise "invalid reviewer" if r.nil?
 
-    r.mark!(phase, **options)
+    r.mark(phase, **options)
   end
 
   def outcome?
-    reviewers.count == reviewers.hired.count
+    n = reviewers.count
+    n > 0 && reviewers.hired.count == n
   end
 end

@@ -10,13 +10,11 @@ class Reviewer < ApplicationRecord
 
 
   def reviewable_by?(user)
-    user.id == user_id
+    user == user_id
   end
 
-  def mark!(phase, **options)
-    raise "unknown phase #{phase}" unless phases.key?(phase)
-
-    update!(
+  def mark(phase, **options)
+    update(
       phase: phase,
       decided_at: Time.current,
       **options

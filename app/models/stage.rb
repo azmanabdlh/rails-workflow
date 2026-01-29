@@ -3,7 +3,7 @@ class Stage < ApplicationRecord
   belongs_to :post
 
 
-  def same_post?(next_stage)
-    post_id == next_stage.post_id
+  def same_post?(stage)
+    post_id == stage.post_id
   end
 end
