@@ -2,6 +2,10 @@ class CandidateController < ApplicationController
 
   def new
     req = params.permit(:candidate_id, :stage_id)
+    # TODO:
+    # 1. change the reviewer state phase to (hired or cancelled)
+    # 2. validate required count reviewer
+    # 3. update or new candidate stage
 
     from = Candidate.find(req[:candidate_id]).current_phase
     to = Stage.find(req[:stage_id])
