@@ -6,15 +6,15 @@ class CandidateStage < ApplicationRecord
 
 
   def can_transition_stage?(stage_id)
-    return false if outcome?
+    unless outcome?
+      (stage.order + 1) == Stage.find(stage_id).order
+    end
 
-    stage.id == stage_id or (stage.order + 1 == Stage.find(stage_id).order)
+    false
   end
 
   def outcome?
-    r = reviewers.find_by(order: 1)
-    Reviewer::OUTCOME.index(r.phase.to_sym).present?
-    # TODO:
+    reviewers.filter { |r| r if r.hired? }.present?
   end
 
 end
