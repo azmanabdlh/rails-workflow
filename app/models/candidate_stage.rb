@@ -5,13 +5,13 @@ class CandidateStage < ApplicationRecord
   has_many :reviewers
 
   def can_transition_to?(to)
-    return false if outcome?
+    return false if stage.is_ended ||  reviewed?
 
     (stage.order + 1) == to.order && stage.same_post?(to)
   end
 
   def valid_transition_phase?(phase)
-    return false if outcome?
+    return false if reviewed?
 
     Reviewer.phases.key?(phase.to_sym)
   end
@@ -44,8 +44,9 @@ class CandidateStage < ApplicationRecord
     r.mark(phase, **options)
   end
 
-  def outcome?
+  def reviewed?
     n = reviewers.count
-    n > 0 && reviewers.hired.count == n
+    n > 0 && (reviewers.hired.count == n) || (reviewers.cancelled.count == n)
   end
+
 end

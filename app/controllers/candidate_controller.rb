@@ -1,7 +1,7 @@
 class CandidateController < ApplicationController
 
   def phase
-    req = candidate_params
+    req = params.permit(:phase, :candidate_id, :stage_id, :feedback)
 
     from = Candidate
       .find(req[:candidate_id])
@@ -19,17 +19,13 @@ class CandidateController < ApplicationController
         feedback: req[:feedback]
       )
 
-      from.reconcile(to) if from.stage_id != to.id
+      from.reconcile(to) if from.reviewed?
 
     rescue => e
       return render json: { message: e.message }, status: :bad_request
     end
 
     render json: {  message: "success" }, status: :ok
-  end
-
-  def candidate_params
-    params.permit(:phase, :candidate_id, :stage_id, :feedback)
   end
 
 end
