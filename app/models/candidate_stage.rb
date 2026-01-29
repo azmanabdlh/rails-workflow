@@ -5,25 +5,34 @@ class CandidateStage < ApplicationRecord
   has_many :reviewers
 
 
-  def can_transition_stage?(stage_id)
-    unless outcome?
-      to = Stage.find(stage_id)
-      return (stage.order + 1) == to.order && to.post_id == stage.post_id
-    end
+  def can_transition_to?(to)
+    return false if outcome?
 
-    false
+    (stage.order + 1) == to.order && stage.same_post?(to)
   end
 
   def valid_transition_phase?(phase)
-    unless outcome?
-      idx = Reviewer::OUTCOME.index(phase)
-      return true unless idx.nil?
-    end
+    return false if outcome?
 
-    false
+    Reviewer.phases.key?(phase.to_s)
+  end
+
+
+  def reconcile(to)
+    transaction do
+      now = Time.current
+      update!(exited_at: now)
+
+      candidate.candidate_stages.create!(
+        stage_id: to.id,
+        entered_at: now
+      )
+
+      candidate.update!(current_stage_id: to.id)
+    end
   end
 
   def outcome?
-    reviewers.filter { |r| r if r.hired? }.present?
+    reviewers.hired.exists?
   end
 end
