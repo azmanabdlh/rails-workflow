@@ -34,13 +34,7 @@ class CandidateStage < ApplicationRecord
 
   def decide_by!(user, phase, **options)
     reviewers.each do |r|
-      continue unless r.reviewable_by?(user)
-
-      r.update(
-        phase: phase,
-        decided_at: Time.current,
-        **options
-      )
+      r.mark!(phase, **options) if r.reviewable_by?(user)
     end
   end
 
