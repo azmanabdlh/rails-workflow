@@ -28,5 +28,3 @@ class CandidateStage < ApplicationRecord
   end
 
 end
-
-cs.valid_transition_phase?(:hired)
