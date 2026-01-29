@@ -7,8 +7,8 @@ class CandidateStage < ApplicationRecord
 
   def can_transition_stage?(stage_id)
     unless outcome?
-      to = Stage.find_by(id: stage_id, post_id: stage.post_id)
-      return (stage.order + 1) == to.order
+      to = Stage.find(id)
+      return (stage.order + 1) == to.order && to.post_id == stage.post_id
     end
 
     false
@@ -26,5 +26,4 @@ class CandidateStage < ApplicationRecord
   def outcome?
     reviewers.filter { |r| r if r.hired? }.present?
   end
-
 end
