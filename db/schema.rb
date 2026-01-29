@@ -40,7 +40,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_28_160854) do
     t.date "ended_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "candidate_id"
   end
 
   create_table "reviewers", force: :cascade do |t|

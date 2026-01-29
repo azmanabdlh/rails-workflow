@@ -9,4 +9,8 @@ class CreatePosts < ActiveRecord::Migration[8.0]
       t.timestamps
     end
   end
+
+  def down
+    drop_table :posts
+  end
 end

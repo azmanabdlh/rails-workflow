@@ -7,7 +7,17 @@ class CandidateStage < ApplicationRecord
 
   def can_transition_stage?(stage_id)
     unless outcome?
-      (stage.order + 1) == Stage.find(stage_id).order
+      to = Stage.find_by(id: stage_id, post_id: stage.post_id)
+      return (stage.order + 1) == to.order
+    end
+
+    false
+  end
+
+  def valid_transition_phase?(phase)
+    unless outcome?
+      idx = Reviewer::OUTCOME.index(phase)
+      return unless idx.nil?
     end
 
     false
@@ -18,3 +28,5 @@ class CandidateStage < ApplicationRecord
   end
 
 end
+
+cs.valid_transition_phase?(:hired)
