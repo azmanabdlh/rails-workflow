@@ -17,7 +17,7 @@ class CandidateStage < ApplicationRecord
   def valid_transition_phase?(phase)
     unless outcome?
       idx = Reviewer::OUTCOME.index(phase)
-      return unless idx.nil?
+      return true unless idx.nil?
     end
 
     false
