@@ -8,8 +8,8 @@ class Reviewer < ApplicationRecord
     hired: 3
   }
 
-  OUTCOME = %i[
-    cancelled
-    hired
-  ]
+
+  def reviewable_by?(user)
+    user.id == user_id
+  end
 end

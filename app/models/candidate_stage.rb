@@ -32,7 +32,19 @@ class CandidateStage < ApplicationRecord
     end
   end
 
+  def decide_by!(user, phase, **options)
+    reviewers.each do |r|
+      continue unless r.reviewable_by?(user)
+
+      r.update(
+        phase: phase,
+        decided_at: Time.current,
+        **options
+      )
+    end
+  end
+
   def outcome?
-    reviewers.hired.exists?
+    reviewers.count == reviewers.hired.count
   end
 end
