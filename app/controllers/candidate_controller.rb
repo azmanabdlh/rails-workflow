@@ -1,19 +1,30 @@
 class CandidateController < ApplicationController
 
-  def new
+  def phase
     req = candidate_params
 
-    from = Candidate.find(req[:candidate_id]).latest_stage_for(req[:post_id])
+    from = Candidate
+      .find(req[:candidate_id])
+      .latest_stage_for(req[:post_id])
     to = Stage.find(req[:stage_id])
 
-    if from.can_transition_to?(to)
-      from.decide_by!(Current.session.user, req[:phase], feedback: req[:feedback])
-      from.reconcile(to) if from.stage_id != to.stage_id
-
-      render json: {  message: "success" }, status: :ok
+    unless from.can_transition_to?(to)
+      render json: { message: "error stage transition" }, status: :bad_request
     end
 
-    render json: { message: "error stage transition" }, status: :bad_request
+    begin
+      from.decide_by!(
+        Current.session.user,
+        req[:phase],
+        feedback: req[:feedback]
+      )
+
+      from.reconcile(to) if from.stage_id != to.stage_id
+    rescue => e
+      render json: { message: e.message }, status: :bad_request
+    end
+
+    render json: {  message: "success" }, status: :ok
   end
 
   def candidate_params

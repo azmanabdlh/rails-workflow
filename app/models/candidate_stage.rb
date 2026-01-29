@@ -4,7 +4,6 @@ class CandidateStage < ApplicationRecord
 
   has_many :reviewers
 
-
   def can_transition_to?(to)
     return false if outcome?
 
@@ -33,9 +32,15 @@ class CandidateStage < ApplicationRecord
   end
 
   def decide_by!(user, phase, **options)
-    reviewers.each do |r|
-      r.mark!(phase, **options) if r.reviewable_by?(user)
+    return unless valid_transition_phase?(phase)
+
+    r = reviewers.filter do |r|
+      r if r.reviewable_by?(user)
     end
+
+    raise "invalid reviewer" if r.nil?
+
+    r.mark!(phase, **options)
   end
 
   def outcome?
