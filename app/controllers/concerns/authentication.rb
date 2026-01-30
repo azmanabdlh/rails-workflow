@@ -35,9 +35,11 @@ module Authentication
       ), @secret)
     end
 
-    def decode(token)
+    def decode!(token)
+      payload = JWT.decode(token, @secret)
       raise "JWT token has expired" if payload.expired?
-      JWT.decode(token, @secret)
+
+      payload
     end
   end
 
@@ -77,7 +79,7 @@ module Authentication
   def perform_authenticate_token
     token = resolve_token
     begin
-      payload = jwt.decode(token)
+      payload = jwt.decode!(token)
       Current.user = User.find(payload.sub)
     rescue => e
       nil
