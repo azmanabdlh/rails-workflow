@@ -13,6 +13,6 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   scope "/api" do
-    post "/candidate/workflow" => "candidate_workflow#decade"
+    post "/candidate/workflow" => "candidate_workflow#decide"
   end
 end
