@@ -13,7 +13,7 @@ class CandidateWorkflowController < ApplicationController
 
     begin
       from.decide_by!(
-        1,
+        resume_session,
         req[:phase],
         feedback: req[:feedback]
       )

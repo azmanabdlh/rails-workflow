@@ -10,7 +10,7 @@ class Reviewer < ApplicationRecord
 
 
   def reviewable_by?(user)
-    user == user_id
+    user.id == user_id
   end
 
   def mark(phase, **options)
