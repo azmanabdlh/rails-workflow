@@ -16,7 +16,7 @@ module Authentication
 
   class JsonWebToken
     def initialize(secret)
-      @_secret = secret.to_s
+      @secret = secret.to_s
     end
 
     def claim_for(user)
@@ -32,12 +32,12 @@ module Authentication
         sub: user.id,
         exp: 10.minutes.from_now.to_i,
         iat: Time.now
-      ), @_secret)
+      ), @secret)
     end
 
     def decode(token)
-      raise "JWT token has expired" unless payload.expired?
-      JWT.decode(token, @_secret)
+      raise "JWT token has expired" if payload.expired?
+      JWT.decode(token, @secret)
     end
   end
 
@@ -65,8 +65,8 @@ module Authentication
 
   private
   def jwt
-    @instance ||= JsonWebToken.new(
-      Rails.application.secrets.secret_key_base
+    @_jwt ||= JsonWebToken.new(
+      Rails.application.credentials.secret_key_base
     )
   end
 
