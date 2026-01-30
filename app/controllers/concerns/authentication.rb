@@ -17,10 +17,7 @@ module Authentication
   class JsonWebToken
     def initialize(secret)
       @secret = secret.to_s
-    end
-
-    def claim_for(user)
-      payload = Struct.new(
+      @schema = Struct.new(
         :sub, :exp, :iat, # ....
       ) do
         def expired?
@@ -28,18 +25,32 @@ module Authentication
         end
       end
 
-      JWT.encode(payload.new(
+    end
+
+    def claim_for(user)
+      payload = @schema.new(
         sub: user.id,
         exp: 10.minutes.from_now.to_i,
         iat: Time.now
-      ), @secret)
+      )
+      JWT.encode(payload.to_json, @secret)
+    end
+
+    def resolve(payload)
+      @schema.new(
+        sub: payload["sub"],
+        exp: payload["exp"],
+        iat: payload["iat"]
+      )
     end
 
     def decode!(token)
-      payload = JWT.decode(token, @secret)
-      raise "JWT token has expired" if payload.expired?
+      raw = JWT.decode(token, @secret)
+      raise "invalid token" if raw.empty? || raw[0].blank?
 
-      payload
+      payload = JSON.parse(raw[0])
+
+      resolve(payload)
     end
   end
 
@@ -78,12 +89,9 @@ module Authentication
 
   def perform_authenticate_token
     token = resolve_token
-    begin
-      payload = jwt.decode!(token)
-      Current.user = User.find(payload.sub)
-    rescue => e
-      nil
-    end
+    payload = jwt.decode!(token)
+
+    Current.user = User.find(payload.sub) unless payload.expired?
   end
 
 end

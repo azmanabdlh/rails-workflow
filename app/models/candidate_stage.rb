@@ -46,7 +46,7 @@ class CandidateStage < ApplicationRecord
 
   def reviewed?
     n = reviewers.count
-    n > 0 && (reviewers.hired.count == n) || (reviewers.cancelled.count == n)
+    n > 0 && (reviewers.passed.count == n) || (reviewers.cancelled.count == n)
   end
 
 end

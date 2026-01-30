@@ -5,7 +5,7 @@ class Reviewer < ApplicationRecord
   enum :phase, {
     pending: 1,
     cancelled: 2,
-    hired: 3
+    passed: 3
   }
 
 
