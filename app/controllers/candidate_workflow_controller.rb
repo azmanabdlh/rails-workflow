@@ -1,15 +1,14 @@
-class CandidateController < ApplicationController
-
-  def phase
+class CandidateWorkflowController < ApplicationController
+  def decide
     req = params.permit(:phase, :candidate_id, :stage_id, :feedback)
 
     from = Candidate
       .find(req[:candidate_id])
-      .latest_stage
+      .last_workflow_stage
     to = Stage.find(req[:stage_id])
 
     unless from.can_transition_to?(to)
-      return render json: { message: "error stage transition" }, status: :bad_request
+      return render json: { message: "invalid stage transition" }, status: :bad_request
     end
 
     begin
@@ -27,5 +26,4 @@ class CandidateController < ApplicationController
 
     render json: {  message: "success" }, status: :ok
   end
-
 end

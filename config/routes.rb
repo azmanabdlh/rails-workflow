@@ -11,5 +11,8 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
-  post "/api/candidate/phase" => "candidate#phase"
+
+  scope "/api" do
+    post "/candidate/workflow" => "candidate_workflow#decade"
+  end
 end

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class CandidateControllerTest < ActionDispatch::IntegrationTest
+class CandidateWorkflowControllerTest < ActionDispatch::IntegrationTest
   # test "the truth" do
   #   assert true
   # end

@@ -1,0 +1,2 @@
+module CandidateWorkflowHelper
+end
