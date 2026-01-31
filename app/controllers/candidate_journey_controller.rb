@@ -2,12 +2,11 @@ class CandidateJourneyController < ApplicationController
 
   def show
     begin
-      data = new_schema(
-        Candidate.find(
-          params[:candidate_id]
-        )
+      candidate = Candidate.find(
+        params[:candidate_id]
       )
-      render json: { data: data || {} }, status: :ok
+
+      render json: { data: new_schema(candidate) }, status: :ok
     rescue => e
       render json: { message: e.message }, status: :not_found
     end
@@ -38,7 +37,7 @@ class CandidateJourneyController < ApplicationController
               entered_at: workflow.entered_at,
               order: workflow.stage.order,
               reviewers: workflow.reviewers.map { |r| new_reviewer(r) },
-              sub_workflows: stage.children.map { |s| new_workflow(workflow, s) }
+              sub_workflows: stage.children.map { |s| new_workflow(s.workflow, s) }
             }
         end
 
@@ -57,7 +56,7 @@ class CandidateJourneyController < ApplicationController
 
 
     last_workflow = candidate.last_workflow_stage
-    return nil if last_workflow.nil?
+    return {} if last_workflow.nil?
 
     instance = obj.new
     instance.current_stage_id = last_workflow.stage_id
