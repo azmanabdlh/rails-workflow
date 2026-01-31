@@ -21,7 +21,7 @@ module Authentication
         :sub, :exp, :iat, # ....
       ) do
         def expired?
-          Time.now >= exp
+          Time.now >= Time.at(exp)
         end
       end
 
