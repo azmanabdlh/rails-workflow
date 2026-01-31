@@ -19,10 +19,10 @@ class CandidateWorkflowController < ApplicationController
       )
 
       from.reconcile(to) if from.passed?
-    rescue => e
-      return render json: { message: e.message }, status: :bad_request
-    end
 
-    render json: {  message: "success" }, status: :ok
+      render json: {  message: "success" }, status: :ok
+    rescue => e
+      render json: { message: e.message }, status: :bad_request
+    end
   end
 end
