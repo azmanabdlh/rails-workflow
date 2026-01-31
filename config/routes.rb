@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 
   scope "/api" do
     post "/candidate/workflow" => "candidate_workflow#decide"
-
+    get "/candidate/journey/:candidate_id" => "candidate_journey#show"
     # auth
     post "/login" => "login#call"
   end

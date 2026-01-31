@@ -89,6 +89,8 @@ module Authentication
 
   def perform_authenticate_token
     token = resolve_token
+    return nil if token.empty?
+
     payload = jwt.decode!(token)
 
     Current.user = User.find(payload.sub) unless payload.expired?
