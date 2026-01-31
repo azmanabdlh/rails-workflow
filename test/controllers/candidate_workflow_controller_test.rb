@@ -36,14 +36,14 @@ class CandidateWorkflowControllerTest < ActionDispatch::IntegrationTest
       current_stage_id: @stage1.id
     )
 
-    @candidate_stage = CandidateStage.create!(
+    @workflow = Workflow.create!(
       candidate: @candidate,
       stage: @stage1,
       entered_at: Time.current
     )
 
     @reviewer = Reviewer.create!(
-      candidate_stage: @candidate_stage,
+      workflow: @workflow,
       user: @user,
       phase: "pending"
     )
@@ -205,8 +205,8 @@ class CandidateWorkflowControllerTest < ActionDispatch::IntegrationTest
       feedback: "Passed stage 1"
     }, headers: auth_headers
 
-    @candidate_stage.reload
-    assert_not_nil @candidate_stage.exited_at
+    @workflow.reload
+    assert_not_nil @workflow.exited_at
   end
 
   test "should include feedback in reviewer mark" do
@@ -235,14 +235,14 @@ class CandidateWorkflowControllerTest < ActionDispatch::IntegrationTest
         current_stage_id: @stage1.id
       )
 
-      candidate_stage = CandidateStage.create!(
+      workflow = Workflow.create!(
         candidate: candidate,
         stage: @stage1,
         entered_at: Time.current
       )
 
       Reviewer.create!(
-        candidate_stage: candidate_stage,
+        workflow: workflow,
         user: @user,
         phase: "pending"
       )

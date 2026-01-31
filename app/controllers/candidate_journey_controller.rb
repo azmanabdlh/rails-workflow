@@ -19,36 +19,37 @@ class CandidateJourneyController < ApplicationController
       :workflows,
     ) do
         def workflows=(workflows)
-          self[:workflows] = new_workflow(workflows)
+          self[:workflows] = workflows.map do |workflow|
+            new_workflow(workflow, workflow.stage)
+          end
+
         end
 
         private
-        def new_workflow(workflows)
-          workflows.map do |workflow|
-            {
-              id: workflow.stage.id,
-              name: workflow.stage.name,
-              is_ended: workflow.stage.is_ended,
+        def new_workflow(workflow, stage)
+           {
+              id: stage.id,
+              name: stage.name,
+              is_ended: stage.is_ended,
               is_passed: workflow.passed?,
               is_cancelled: workflow.cancelled?,
+              has_children: stage.has_children?,
               exited_at: workflow.exited_at,
               entered_at: workflow.entered_at,
               order: workflow.stage.order,
-              reviewers: new_reviewer(workflow.reviewers)
+              reviewers: workflow.reviewers.map { |r| new_reviewer(r) },
+              sub_workflows: stage.children.map { |s| new_workflow(workflow, s) }
             }
-          end
         end
 
-        def new_reviewer(reviewers)
-          reviewers.map do |reviewer|
-            {
-              id: reviewer.id,
-              phase: reviewer.phase,
-              feedback: reviewer.feedback,
-              decided_at: reviewer.decided_at,
-              user_id: reviewer.user_id
-            }
-          end
+        def new_reviewer(reviewer)
+          {
+            id: reviewer.id,
+            phase: reviewer.phase,
+            feedback: reviewer.feedback,
+            decided_at: reviewer.decided_at,
+            user_id: reviewer.user_id
+          }
         end
 
 

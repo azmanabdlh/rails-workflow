@@ -5,10 +5,10 @@ class Workflow < ApplicationRecord
   has_many :reviewers
 
   def can_transition_to?(to)
-    # prevent transition if current stage ended or reviewed by adding "reviewed?"
-    return false if stage.is_ended
+    # prevent transition if current stage ended or "reviewed?"
+    return false if stage.is_ended || to.has_children?
 
-    (stage.order + 1) == to.order && stage.same_post?(to)
+    stage.direct_to?(to) or stage.sibling?(to) or stage.sub?(to) and stage.same_post?(to)
   end
 
   def valid_transition_phase?(phase)
