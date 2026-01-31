@@ -26,16 +26,12 @@ class Stage < ApplicationRecord
     (order + 1) == to.order
   end
 
-  def ascend?(to)
+  def leave_sub?(to)
     child? && (parent.order + 1) == to.order
   end
 
-  def descend?(to)
+  def enter_sub?(to)
     to.child? && (order + 1) == to.parent.order
-  end
-
-  def sub?(stage)
-    ascend?(stage) || descend?(stage)
   end
 
 end

@@ -8,7 +8,8 @@ class Workflow < ApplicationRecord
     # prevent transition if current stage ended or "reviewed?"
     return false if stage.is_ended || to.has_children?
 
-    stage.direct_to?(to) or stage.sibling?(to) or stage.sub?(to) and stage.same_post?(to)
+   ( stage.direct_to?(to) or stage.sibling?(to) or stage.enter_sub?(to) or stage.leave_sub?(to) )
+      and stage.same_post?(to)
   end
 
   def valid_transition_phase?(phase)
