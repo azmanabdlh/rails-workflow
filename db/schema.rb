@@ -10,20 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_30_114258) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_31_073913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
-  create_table "candidate_stages", force: :cascade do |t|
-    t.bigint "candidate_id", null: false
-    t.bigint "stage_id", null: false
-    t.date "entered_at"
-    t.date "exited_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["candidate_id"], name: "index_candidate_stages_on_candidate_id"
-    t.index ["stage_id"], name: "index_candidate_stages_on_stage_id"
-  end
 
   create_table "candidates", force: :cascade do |t|
     t.string "name"
@@ -43,7 +33,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_30_114258) do
   end
 
   create_table "reviewers", force: :cascade do |t|
-    t.bigint "candidate_stage_id", null: false
+    t.bigint "workflow_id", null: false
     t.integer "phase"
     t.date "decided_at"
     t.text "feedback"
@@ -51,7 +41,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_30_114258) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["candidate_stage_id"], name: "index_reviewers_on_candidate_stage_id"
+    t.index ["workflow_id"], name: "index_reviewers_on_workflow_id"
     t.index ["user_id"], name: "index_reviewers_on_user_id"
   end
 
@@ -75,10 +65,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_30_114258) do
     t.string "password_digest"
   end
 
-  add_foreign_key "candidate_stages", "candidates"
-  add_foreign_key "candidate_stages", "stages"
-  add_foreign_key "reviewers", "candidate_stages"
+  create_table "workflows", force: :cascade do |t|
+    t.bigint "candidate_id", null: false
+    t.bigint "stage_id", null: false
+    t.datetime "entered_at"
+    t.datetime "exited_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["candidate_id"], name: "index_workflows_on_candidate_id"
+    t.index ["stage_id"], name: "index_workflows_on_stage_id"
+  end
+
+  add_foreign_key "workflows", "candidates"
+  add_foreign_key "workflows", "stages"
+  add_foreign_key "reviewers", "workflows"
   add_foreign_key "reviewers", "users"
   add_foreign_key "stages", "posts"
   add_foreign_key "stages", "stages", column: "parent_id"
+  add_foreign_key "workflows", "candidates"
+  add_foreign_key "workflows", "stages"
 end

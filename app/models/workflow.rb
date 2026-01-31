@@ -1,4 +1,4 @@
-class CandidateStage < ApplicationRecord
+class Workflow < ApplicationRecord
   belongs_to :candidate
   belongs_to :stage
 
@@ -21,7 +21,7 @@ class CandidateStage < ApplicationRecord
       now = Time.current
       update!(exited_at: now)
 
-      candidate.candidate_stages.find_or_create_by(
+      candidate.workflows.find_or_create_by(
         stage_id: to.id
       ) do |c|
         c.entered_at = now
@@ -56,5 +56,4 @@ class CandidateStage < ApplicationRecord
     n = reviewers.count
     n > 0 && n == reviewers.cancelled.count
   end
-
 end

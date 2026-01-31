@@ -7,7 +7,7 @@ class CandidateJourneyController < ApplicationController
           params[:candidate_id]
         )
       )
-      render json: { data: data }, status: :ok
+      render json: { data: data || {} }, status: :ok
     rescue => e
       render json: { message: e.message }, status: :not_found
     end
@@ -54,12 +54,14 @@ class CandidateJourneyController < ApplicationController
 
     end
 
-    instance = obj.new(
-      candidate.last_workflow_stage.stage_id,
-      {},
-    )
 
+    last_workflow = candidate.last_workflow_stage
+    return nil if last_workflow.nil?
+
+    instance = obj.new
+    instance.current_stage_id = last_workflow.stage_id
     instance.workflows = candidate.workflows
+
     instance
   end
 

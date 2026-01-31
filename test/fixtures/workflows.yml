@@ -3,11 +3,11 @@
 one:
   candidate: one
   stage: one
-  entered_at: 2026-01-28
-  exited_at: 2026-01-28
+  entered_at: 2026-01-31 16:39:13
+  exited_at: 2026-01-31 16:39:13
 
 two:
   candidate: two
   stage: two
-  entered_at: 2026-01-28
-  exited_at: 2026-01-28
+  entered_at: 2026-01-31 16:39:13
+  exited_at: 2026-01-31 16:39:13

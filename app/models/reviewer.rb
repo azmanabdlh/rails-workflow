@@ -1,5 +1,5 @@
 class Reviewer < ApplicationRecord
-  belongs_to :candidate_stage
+  belongs_to :workflow
   belongs_to :user
 
   enum :phase, {
