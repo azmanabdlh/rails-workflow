@@ -8,6 +8,11 @@ class Reviewer < ApplicationRecord
     passed: 3
   }
 
+  enum :role, {
+    assoc: 1,
+    lead: 2,
+    veto: 3
+  }
 
   def reviewable_by?(user)
     user.id == user_id

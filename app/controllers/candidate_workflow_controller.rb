@@ -18,7 +18,7 @@ class CandidateWorkflowController < ApplicationController
         feedback: req[:feedback]
       )
 
-      from.reconcile(to) if from.passed?
+      from.reconcile(to) if from.reviewed?
 
       render json: {  message: "success" }, status: :ok
     rescue => e

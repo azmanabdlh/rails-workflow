@@ -5,7 +5,6 @@ class Stage < ApplicationRecord
   has_one :workflow
   has_many :children, class_name: "Stage", foreign_key: "parent_id"
 
-
   def same_post?(to)
     post_id == to.post_id
   end

@@ -3,16 +3,38 @@ class Workflow < ApplicationRecord
   belongs_to :stage
 
   has_many :reviewers
+  has_many :workflow_policies
 
-  def can_transition_to?(to)
-    # prevent transition if current stage ended or "reviewed?"
-    return false if stage.is_ended || to.has_children?
+  alias_method :policies, :workflow_policies
 
-   ( stage.direct_to?(to) or stage.sibling?(to) or stage.enter_sub?(to) or stage.leave_sub?(to) )
-      and stage.same_post?(to)
+
+  def review_quorum_met?
+    phase = policies.action_phase
+    return false unless valid_phase?(phase)
+
+    lead_quorum_met?(phase) or assoc_quorum_met?(phase)
   end
 
-  def valid_transition_phase?(phase)
+  def lead_quorum_met?(phase)
+    policies.quorum.min_lead_reviewers == reviewers.lead.public_send(phase).size
+  end
+
+
+  def assoc_quorum_met?(phase)
+    policies.quorum.min_reviewers == reviewers.assoc.public_send(phase).size
+  end
+
+  def reviewed?
+    reviewers.pending.empty? and (reviewers.vote.size > 0 or review_quorum_met?)
+  end
+
+  def can_transition_to?(to)
+    return false if stage.is_ended || to.has_children?
+
+   (stage.direct_to?(to) or stage.enter_sub?(to) or stage.sibling?(to) or stage.leave_sub?(to)) and stage.same_post?(to)
+  end
+
+  def valid_phase?(phase)
     Reviewer.phases.key?(phase.to_sym)
   end
 
@@ -33,7 +55,7 @@ class Workflow < ApplicationRecord
   end
 
   def decide_by!(user, phase, **options)
-    raise "unknown phase #{phase}" unless valid_transition_phase?(phase)
+    raise "unknown phase #{phase}" unless valid_phase?(phase)
 
     r = reviewers.filter do |r|
       r if r.reviewable_by?(user)
@@ -42,19 +64,5 @@ class Workflow < ApplicationRecord
     raise "invalid reviewer" if r.nil?
 
     r.mark(phase, **options)
-  end
-
-  def reviewed?
-    passed? || cancelled?
-  end
-
-  def passed?
-    n = reviewers.count
-    n > 0 && n == reviewers.passed.count
-  end
-
-  def cancelled?
-    n = reviewers.count
-    n > 0 && n == reviewers.cancelled.count
   end
 end
