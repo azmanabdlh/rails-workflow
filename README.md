@@ -1,59 +1,41 @@
+
 ![Rails Workflow Example](example.png)
-## 📋 Project Overview
 
-**Rails Workflow** is a learning project designed to build a recruitment job workflow management system. This project implements a modern application architecture using Ruby on Rails with the following features:
+# Rails Workflow
 
-- **Candidate Management**: Track candidate data throughout the recruitment process
-- **Workflow Stage Management**: Manage recruitment stages with progress tracking
-- **User & Authentication**: Login system and user management for recruiters and reviewers
-- **Job Posts Management**: Create and manage job openings
-- **Reviewer Assignment**: Assign reviewers to evaluate candidates
+A small Rails app for managing candidate workflows and reviews.
 
-## 🚀 Quick Start
+## Key features
 
-### Prerequisites
+- Candidate and stage management
+- JWT-based login and API endpoints
+- Reviewer roles: assoc, lead, veto
+- Workflow policies: configure policy (JSON) that controls whether a decision advances the candidate to the next stage or allows rollback when a "cancelled" quorum is met
 
-- Ruby 3.0 or higher
-- Rails 8.0 or higher
-- SQLite3
-- PostgreSQL
+## API (examples)
 
-### Installation
+- POST /api/login — returns JWT
+- POST /api/candidate/workflow — submit reviewer decision
+- GET  /api/candidate/journey/:candidate_id — workflow history
 
-1. Clone the repository
-```bash
-git clone <repository-url>
-cd rails-workflow
+POST /api/candidate/workflow JSON:
+
+```json
+{ "phase": "passed", "candidate_id": 1, "stage_id": 2, "feedback": "Good" }
 ```
 
-2. Install dependencies
-```bash
-bundle install
-```
+## Quick start
 
-3. Setup the database
-```bash
-rails db:create
-rails db:migrate
-rails db:seed
-```
+1. Install dependencies: `bundle install`
+2. Set env vars: `RAILS_DB_USERNAME`, `RAILS_DB_PASSWORD`, `SECRET_KEY_BASE`
+3. DB setup: `rails db:create db:migrate db:seed`
+4. Start server: `bin/rails server`
 
-4. Start the server
-```bash
-rails server
-```
+## Tests
 
-The application will run at `http://localhost:3000`
+- Run all tests: `bin/rails test`
+- Run a single file: `bin/rails test test/controllers/candidate_workflow_controller_test.rb`
 
-## 🗄️ Database Models
-
-- **User**: Recruiter and reviewer accounts
-- **Post**: Job openings
-- **Candidate**: Applicant data and application status
-- **Stage**: Recruitment stages (Interview, Assessment, etc.)
-- **Workflow**: Workflow configuration for each job post
-- **Reviewer**: Reviewer assignments for candidate evaluation
-
-## 📝 License
+## License
 
 MIT
