@@ -8,24 +8,34 @@ class Workflow < ApplicationRecord
   alias_method :policies, :workflow_policies
 
 
-  def review_quorum_met?
-    phase = policies.action_phase
+  def review_quorum_met?(phase)
     return false unless valid_phase?(phase)
 
     lead_quorum_met?(phase) or assoc_quorum_met?(phase)
   end
 
   def lead_quorum_met?(phase)
-    reviewers.lead.public_send(phase).size >= policies.quorum.min_lead_reviewers
+    return true unless policy?
+    puts "policy(phase) => #{policy(phase)} = #{phase}"
+    reviewers.lead.public_send(phase).size >= policy(phase).quorum.min_lead_reviewers
   end
-
 
   def assoc_quorum_met?(phase)
-    reviewers.assoc.public_send(phase).size >= policies.quorum.min_reviewers
+    return true unless policy?
+
+    reviewers.assoc.public_send(phase).size >= policy(phase).quorum.min_reviewers
   end
 
-  def reviewed?
-    reviewers.pending.empty? and (reviewers.vote.size > 0 or review_quorum_met?)
+  def policy(phase)
+    policies.public_send(phase).first
+  end
+
+  def policy?
+    policies.size > 0
+  end
+
+  def reviewed?(phase)
+    reviewers.veto.size > 0 or review_quorum_met?(phase)
   end
 
   def can_transition_to?(to)
@@ -44,7 +54,14 @@ class Workflow < ApplicationRecord
     action_phase = "cancelled"
     return false unless valid_phase?(action_phase)
 
-    reviewers.vote.cancelled.size > 0 or lead_quorum_met?(action_phase) or assoc_quorum_met?(action_phase)
+    reviewers.veto.cancelled.size > 0 or lead_quorum_met?(action_phase) or assoc_quorum_met?(action_phase)
+  end
+
+  def passed?
+    action_phase = "passed"
+    return false unless valid_phase?(action_phase)
+
+    reviewers.veto.passed.size > 0 or lead_quorum_met?(action_phase) or assoc_quorum_met?(action_phase)
   end
 
   def valid_phase?(phase)

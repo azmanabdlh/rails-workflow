@@ -12,13 +12,15 @@ class CandidateWorkflowController < ApplicationController
     end
 
     begin
+      action_phase = req[:phase]
+
       from.decide_by!(
         resume_session,
-        req[:phase],
+        action_phase,
         feedback: req[:feedback]
       )
 
-      from.reconcile(to) if from.reviewed?
+      from.reconcile(to) if from.reviewed?(action_phase)
 
       render json: {  message: "success" }, status: :ok
     rescue => e

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_01_142752) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_02_045811) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,6 +75,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_01_142752) do
     t.string "password_digest"
   end
 
+  create_table "workflow_policies", force: :cascade do |t|
+    t.jsonb "quorum_raw"
+    t.bigint "workflow_id", null: false
+    t.boolean "active"
+    t.integer "action_phase"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workflow_id"], name: "index_workflow_policies_on_workflow_id"
+  end
+
   create_table "workflows", force: :cascade do |t|
     t.bigint "candidate_id", null: false
     t.bigint "stage_id", null: false
@@ -91,6 +101,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_01_142752) do
   add_foreign_key "reviewers", "users"
   add_foreign_key "stages", "posts"
   add_foreign_key "stages", "stages", column: "parent_id"
+  add_foreign_key "workflow_policies", "workflows"
   add_foreign_key "workflows", "candidates"
   add_foreign_key "workflows", "stages"
 end

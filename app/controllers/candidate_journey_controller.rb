@@ -8,6 +8,7 @@ class CandidateJourneyController < ApplicationController
 
       render json: { data: new_schema(candidate) }, status: :ok
     rescue => e
+      puts "e => #{e}"
       render json: { message: e.message }, status: :not_found
     end
   end
@@ -37,8 +38,16 @@ class CandidateJourneyController < ApplicationController
               entered_at: workflow.entered_at,
               order: workflow.stage.order,
               reviewers: workflow.reviewers.map { |r| new_reviewer(r) },
-              sub_workflows: stage.children.map { |s| new_workflow(s.workflow, s) }
+              children: stage.children.map { |s| new_workflow(s.workflow, s) },
+              policies: workflow.policies.map { |p| new_workflow_policy(p) }
             }
+        end
+
+        def new_workflow_policy(policy)
+          {
+            quorum: policy.quorum,
+            action_phase: policy.action_phase
+          }
         end
 
         def new_reviewer(reviewer)
