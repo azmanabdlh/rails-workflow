@@ -257,4 +257,89 @@ class CandidateWorkflowControllerTest < ActionDispatch::IntegrationTest
       assert_response :ok, "Failed for phase: #{phase}"
     end
   end
+
+  test "should allow rollback when cancelled quorum met" do
+    # Move candidate to stage 2 (current)
+    @candidate.update!(current_stage_id: @stage2.id)
+
+    wf2 = Workflow.create!(
+      candidate: @candidate,
+      stage: @stage2,
+      entered_at: Time.current
+    )
+
+    # Policy requires 1 lead reviewer to cancel
+    WorkflowPolicy.create!(
+      workflow: wf2,
+      action_phase: "cancelled",
+      quorum_raw: '{"min_reviewers":0,"min_lead_reviewers":1}',
+      active: true
+    )
+
+    # Lead reviewer already marked cancelled
+    Reviewer.create!(
+      workflow: wf2,
+      user: @user,
+      role: "lead",
+      phase: "cancelled"
+    )
+
+    post "/api/candidate/workflow", params: {
+      phase: "cancelled",
+      candidate_id: @candidate.id,
+      stage_id: @stage1.id,
+      feedback: "rollback"
+    }, headers: auth_headers
+
+    assert_response :ok
+
+    @candidate.reload
+    assert_equal @stage1.id, @candidate.current_stage_id
+
+    wf2.reload
+    assert_not_nil wf2.exited_at
+  end
+
+  test "should not reconcile when policy quorum not met" do
+    WorkflowPolicy.create!(
+      workflow: @workflow,
+      action_phase: "passed",
+      quorum_raw: '{"min_reviewers":2,"min_lead_reviewers":2}',
+      active: true
+    )
+
+    post "/api/candidate/workflow", params: {
+      phase: "passed",
+      candidate_id: @candidate.id,
+      stage_id: @stage2.id,
+      feedback: "not enough reviewers"
+    }, headers: auth_headers
+
+    assert_response :ok
+
+    @candidate.reload
+    # Should still be on stage1 because quorum not met
+    assert_equal @stage1.id, @candidate.current_stage_id
+
+    @workflow.reload
+    assert_nil @workflow.exited_at
+  end
+
+  test "should return error when authenticated user is not a reviewer" do
+    other = User.create!(email: "outsider@example.com", password: "password123")
+
+    post "/api/login", params: { email: other.email, password: "password123" }
+    token = JSON.parse(response.body)["token"]
+
+    post "/api/candidate/workflow", params: {
+      phase: "passed",
+      candidate_id: @candidate.id,
+      stage_id: @stage2.id,
+      feedback: "trying to mark"
+    }, headers: auth_headers(token)
+
+    assert_response :bad_request
+    response_body = JSON.parse(response.body)
+    assert_equal "invalid reviewer", response_body["message"]
+  end
 end

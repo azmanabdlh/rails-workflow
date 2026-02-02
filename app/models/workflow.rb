@@ -15,13 +15,13 @@ class Workflow < ApplicationRecord
   end
 
   def lead_quorum_met?(phase)
-    return true unless policy?
+    return true unless policy?(phase)
 
     reviewers.lead.public_send(phase).size >= policy(phase).quorum.min_lead_reviewers
   end
 
   def assoc_quorum_met?(phase)
-    return true unless policy?
+    return true unless policy?(phase)
 
     reviewers.assoc.public_send(phase).size >= policy(phase).quorum.min_reviewers
   end
@@ -30,8 +30,8 @@ class Workflow < ApplicationRecord
     policies.public_send(phase).first
   end
 
-  def policy?
-    policies.size > 0
+  def policy?(phase)
+    policies.public_send(phase).size > 0
   end
 
   def reviewed?(phase)
