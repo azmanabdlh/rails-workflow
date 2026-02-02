@@ -44,7 +44,7 @@ class Workflow < ApplicationRecord
     action_phase = "cancelled"
     return false unless valid_phase?(action_phase)
 
-    reviewers.vote.cancelled.size > 0 and (lead_quorum_met?(action_phase) or assoc_quorum_met?(action_phase))
+    reviewers.vote.cancelled.size > 0 or lead_quorum_met?(action_phase) or assoc_quorum_met?(action_phase)
   end
 
   def valid_phase?(phase)
