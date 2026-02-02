@@ -192,7 +192,7 @@ class CandidateWorkflowControllerTest < ActionDispatch::IntegrationTest
       feedback: "Passed first stage"
     }, headers: auth_headers
 
-    new_stage = @candidate.candidate_stages.find_by(stage_id: @stage2.id)
+    new_stage = @candidate.workflows.find_by(stage_id: @stage2.id)
     assert_not_nil new_stage
     assert_not_nil new_stage.entered_at
   end
