@@ -35,7 +35,7 @@ class Workflow < ApplicationRecord
   end
 
   def reviewed?(phase)
-    reviewers.veto.size > 0 or review_quorum_met?(phase)
+    reviewers.veto.public_send(phase).size > 0 or review_quorum_met?(phase)
   end
 
   def can_transition_to?(to)
