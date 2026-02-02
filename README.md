@@ -14,14 +14,22 @@ A small Rails app for managing candidate workflows and reviews.
 
 ## API (examples)
 
-- POST /api/login — returns JWT
+```bash
+- POST /api/login
 - POST /api/candidate/workflow — submit reviewer decision
-- GET  /api/candidate/journey/:candidate_id — workflow history
-
-POST /api/candidate/workflow JSON:
+- GET  /api/candidate/journey/:candidate_id — workflow journey for a candidate
+```
 
 ```json
-{ "phase": "passed", "candidate_id": 1, "stage_id": 2, "feedback": "Good" }
+POST /api/candidate/workflow
+
+body:
+{
+  "phase": "passed",
+  "candidate_id": 1,
+  "stage_id": 2,
+  "feedback": "Good"
+}
 ```
 
 ## Quick start
