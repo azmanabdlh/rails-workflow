@@ -16,7 +16,7 @@ class Workflow < ApplicationRecord
 
   def lead_quorum_met?(phase)
     return true unless policy?
-    puts "policy(phase) => #{policy(phase)} = #{phase}"
+
     reviewers.lead.public_send(phase).size >= policy(phase).quorum.min_lead_reviewers
   end
 
