@@ -30,7 +30,7 @@ module Authentication
     def claim_for(user)
       payload = @schema.new(
         sub: user.id,
-        exp: 10.minutes.from_now.to_i,
+        exp: 15.minutes.from_now.to_i,
         iat: Time.now
       )
       JWT.encode(payload.to_json, @secret)
