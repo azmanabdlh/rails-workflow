@@ -16,12 +16,12 @@ class Workflow < ApplicationRecord
   end
 
   def lead_quorum_met?(phase)
-    policies.quorum.min_lead_reviewers == reviewers.lead.public_send(phase).size
+    reviewers.lead.public_send(phase).size >= policies.quorum.min_lead_reviewers
   end
 
 
   def assoc_quorum_met?(phase)
-    policies.quorum.min_reviewers == reviewers.assoc.public_send(phase).size
+    reviewers.assoc.public_send(phase).size >= policies.quorum.min_reviewers
   end
 
   def reviewed?
@@ -29,9 +29,22 @@ class Workflow < ApplicationRecord
   end
 
   def can_transition_to?(to)
-    return false if stage.is_ended || to.has_children?
+    return false if stage.is_ended or to.has_children?
+
+    return true if can_rollback?(to)
 
    (stage.direct_to?(to) or stage.enter_sub?(to) or stage.sibling?(to) or stage.leave_sub?(to)) and stage.same_post?(to)
+  end
+
+  def can_rollback?(to)
+    cancelled? and to.order < stage.order and stage.same_post?(to)
+  end
+
+  def cancelled?
+    action_phase = "cancelled"
+    return false unless valid_phase?(action_phase)
+
+    reviewers.vote.cancelled.size > 0 and (lead_quorum_met?(action_phase) or assoc_quorum_met?(action_phase))
   end
 
   def valid_phase?(phase)
